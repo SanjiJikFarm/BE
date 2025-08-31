@@ -1,13 +1,13 @@
-package com.example.demo;
+package com.example.SanjiBE;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class DemoApplication {
+public class SanjiBEApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(DemoApplication.class, args);
+		SpringApplication.run(SanjiBEApplication.class, args);
 	}
 
 }
