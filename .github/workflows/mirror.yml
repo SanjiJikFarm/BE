@@ -1,0 +1,23 @@
+name: Mirror to GitLab
+
+on:
+  push:
+    branches:
+      - '**'   # 모든 브랜치
+  delete:      # 브랜치/태그 삭제도 동기화
+  create:      # 새 브랜치/태그도 동기화
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Push to GitLab (mirror all branches/tags)
+        run: |
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "GitHub Actions"
+
+          git remote add gitlab https://oauth2:${{ secrets.GITLAB_TOKEN }}@gitlab.com/sanjijikfarm-group/BE.git
+          git push --mirror gitlab
