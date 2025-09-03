@@ -3,9 +3,9 @@ name: Mirror to GitLab
 on:
   push:
     branches:
-      - '**'   # 모든 브랜치
-  delete:      # 브랜치/태그 삭제도 동기화
-  create:      # 새 브랜치/태그도 동기화
+      - '**'
+  delete:
+  create:
 
 jobs:
   mirror:
@@ -13,8 +13,10 @@ jobs:
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Push to GitLab (mirror all branches/tags)
+      - name: Push to GitLab
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
