@@ -1,20 +1,20 @@
-name: Mirror to GitLab
-
 on:
   push:
     branches:
-      - main
+      - '**'
+  delete:
+  create:
 
 jobs:
-  sync:
+  mirror:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout source
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
       - name: Push to GitLab
         run: |
           git config --global user.email "github-actions@github.com"
           git config --global user.name "GitHub Actions"
-          git remote add gitlab ${{ secrets.GITLAB_REPO_URL }}
-          git push --force gitlab HEAD:main
