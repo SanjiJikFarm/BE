@@ -3,10 +3,7 @@ package com.example.SanjiBE.controller;
 import com.example.SanjiBE.dto.ShopResponse;
 import com.example.SanjiBE.service.ShopService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,5 +24,11 @@ public class ShopController {
     @GetMapping
     public List<ShopResponse> getAllShops() {
         return shopService.getAllShops();
+    }
+
+    // 검색
+    @GetMapping
+    public List<ShopResponse> searchShops(@RequestParam(required = false) String search) {
+        return shopService.searchShops(search == null ? "" : search);
     }
 }

@@ -56,5 +56,26 @@ public class ShopServiceImpl implements ShopService {
             );
         }).collect(Collectors.toList());
     }
+
+    @Override
+    public List<ShopResponse> searchShops(String keyword) {
+        List<Shop> shops = shopRepository.findByShopNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword);
+
+        return shops.stream().map(shop -> {
+            double avgRating = shop.getReviews().isEmpty() ? 0.0 :
+                    shop.getReviews().stream()
+                            .mapToInt(Review::getRating)
+                            .average()
+                            .orElse(0.0);
+
+            return new ShopResponse(
+                    shop.getId(),
+                    shop.getShopName(),
+                    shop.getShopImage(),
+                    shop.getAddress(),
+                    avgRating
+            );
+        }).collect(Collectors.toList());
+    }
 }
 

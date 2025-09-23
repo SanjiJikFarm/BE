@@ -12,3 +12,4 @@ public class ShopResponse {
     private String address;
     private Double averageRating;
 }
+
