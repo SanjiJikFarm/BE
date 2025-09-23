@@ -29,11 +29,6 @@ public class Review {
     @Column(name = "review_like")
     private Integer reviewLike;
 
-    // 매장 단위 리뷰
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "shop_id")
-    private Shop shop;
-
     // 상품 단위 리뷰
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)

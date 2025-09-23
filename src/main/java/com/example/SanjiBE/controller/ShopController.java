@@ -27,8 +27,8 @@ public class ShopController {
     }
 
     // 검색
-    @GetMapping
-    public List<ShopResponse> searchShops(@RequestParam(required = false) String search) {
-        return shopService.searchShops(search == null ? "" : search);
+    @GetMapping(params = "keyword")
+    public List<ShopResponse> searchShops(@RequestParam String keyword) {
+        return shopService.searchShops(keyword);
     }
 }

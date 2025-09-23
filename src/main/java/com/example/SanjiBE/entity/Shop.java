@@ -37,7 +37,7 @@ public class Shop {
     @Column(name = "shop_image")
     private String shopImage;
 
-    // 리뷰와의 관계
-    @OneToMany(mappedBy = "shop", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Review> reviews;
+    // 상품과의 관계
+    @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
+    private List<Product> products;
 }

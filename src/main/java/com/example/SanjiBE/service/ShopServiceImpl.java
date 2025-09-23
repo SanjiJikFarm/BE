@@ -18,64 +18,18 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public ShopResponse getShopById(Long shopId) {
-        Shop shop = shopRepository.findById(shopId)
+        return shopRepository.findOneWithStats(shopId)
                 .orElseThrow(() -> new RuntimeException("Shop not found"));
-
-        double avgRating = shop.getReviews().isEmpty() ?
-                0.0 :
-                shop.getReviews().stream()
-                        .mapToInt(Review::getRating)
-                        .average()
-                        .orElse(0.0);
-
-        return new ShopResponse(
-                shop.getId(),
-                shop.getShopName(),
-                shop.getShopImage(),
-                shop.getAddress(),
-                avgRating
-        );
     }
 
     @Override
     public List<ShopResponse> getAllShops() {
-        return shopRepository.findAll().stream().map(shop -> {
-            double avgRating = shop.getReviews().isEmpty() ?
-                    0.0 :
-                    shop.getReviews().stream()
-                            .mapToInt(Review::getRating)
-                            .average()
-                            .orElse(0.0);
-
-            return new ShopResponse(
-                    shop.getId(),
-                    shop.getShopName(),
-                    shop.getShopImage(),
-                    shop.getAddress(),
-                    avgRating
-            );
-        }).collect(Collectors.toList());
+        return shopRepository.findAllWithStats();
     }
 
     @Override
     public List<ShopResponse> searchShops(String keyword) {
-        List<Shop> shops = shopRepository.findByShopNameContainingIgnoreCaseOrAddressContainingIgnoreCase(keyword, keyword);
-
-        return shops.stream().map(shop -> {
-            double avgRating = shop.getReviews().isEmpty() ? 0.0 :
-                    shop.getReviews().stream()
-                            .mapToInt(Review::getRating)
-                            .average()
-                            .orElse(0.0);
-
-            return new ShopResponse(
-                    shop.getId(),
-                    shop.getShopName(),
-                    shop.getShopImage(),
-                    shop.getAddress(),
-                    avgRating
-            );
-        }).collect(Collectors.toList());
+        String key = (keyword == null) ? "" : keyword.trim();
+        return shopRepository.searchWithStats(key);
     }
 }
-
