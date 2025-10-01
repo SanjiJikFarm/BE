@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 
 @Entity
 
@@ -35,23 +33,5 @@ public class Receipt {
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
-    // 영수증 - 구매
-    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Purchase> purchaseList;
-
-    private Receipt(User user, Shop shop, LocalDate receiptDate, int totalPrice) {
-        this.user = user;
-        this.shop = shop;
-        this.receiptDate = receiptDate;
-        this.totalPrice = totalPrice;
-    }
-
-    public Receipt() {
-
-    }
-
-    public static Receipt create(User user, Shop shop, LocalDate date, int total) {
-        return new Receipt(user, shop, date, total);
-    }
 
 }

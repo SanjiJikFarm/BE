@@ -12,8 +12,6 @@ public class FoodApiResponse {
   private String foodName; // 식재료 이름(fdmtNm)
   private String imageUrl; // 이미지 URL(경로 + 파일명)
 
-  // 기본 생성자
-  public FoodApiResponse() {}
 
   public FoodApiResponse(String foodNum, String foodName, String imageUrl){
     this.foodNum = foodNum;
@@ -21,13 +19,6 @@ public class FoodApiResponse {
     this.imageUrl = imageUrl;
   }
 
-    public void setFoodName(String foodName){
-    this.foodNum = foodName;
-  }
-
-  public void getImageUrl(String imageUrl){
-    this.imageUrl = imageUrl;
-  }
 }
 
 

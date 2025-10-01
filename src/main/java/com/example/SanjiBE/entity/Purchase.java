@@ -33,7 +33,4 @@ public class Purchase {
         this.quantity = quantity;
     }
 
-    public static Purchase of(Receipt receipt, Product product, int quantity) {
-        return new Purchase(receipt, product, quantity);
-    }
 }
