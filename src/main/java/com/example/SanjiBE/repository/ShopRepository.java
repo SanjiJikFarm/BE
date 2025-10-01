@@ -70,4 +70,7 @@ public interface ShopRepository extends JpaRepository<Shop, Long> {
         GROUP BY s.id, s.shopName, s.shopImage, s.address
         """)
     Optional<ShopResponse> findOneWithStats(@Param("shopId") Long shopId);
+
+    Optional<Shop> findByShopName(String shopName);
+
 }

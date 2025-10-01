@@ -1,7 +1,14 @@
 package com.example.SanjiBE.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class FoodApiResponse {
-  private String foodNum; // 식재료 번호(cntntsNo)
+    // Getter
+    //Setter
+    @Setter
+    private String foodNum; // 식재료 번호(cntntsNo)
   private String foodName; // 식재료 이름(fdmtNm)
   private String imageUrl; // 이미지 URL(경로 + 파일명)
 
@@ -14,25 +21,7 @@ public class FoodApiResponse {
     this.imageUrl = imageUrl;
   }
 
-  // Getter
-  public String getFoodNum(){
-    return foodNum;
-  }
-
-  public String getFoodName(){
-    return foodName;
-  }
-
-  public String getImageUrl(){
-    return imageUrl;
-  }
-
-  //Setter
-  public void setFoodNum(String foodNum){
-    this.foodNum = foodNum;
-  }
-
-  public void setFoodName(String foodName){
+    public void setFoodName(String foodName){
     this.foodNum = foodName;
   }
 
