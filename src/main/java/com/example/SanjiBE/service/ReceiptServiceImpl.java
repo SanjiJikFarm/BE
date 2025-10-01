@@ -84,6 +84,36 @@ public class ReceiptServiceImpl implements ReceiptService {
     }
 
     @Transactional
+    public List<ReceiptResponse> getReceiptsByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자가 없습니다."));
+
+        List<Receipt> receipts = receiptRepository.findByUser(user);
+
+        List<ReceiptResponse> responses = new ArrayList<>();
+        for (Receipt r : receipts) {
+            // Purchase → ReceiptItemDto 변환
+            List<ReceiptItemDto> items = r.getPurchases().stream()
+                    .map(p -> new ReceiptItemDto(
+                            p.getProduct().getProductName(),
+                            String.valueOf(p.getProduct().getProductPrice()),
+                            String.valueOf(p.getQuantity()),
+                            String.valueOf(p.getProduct().getProductPrice() * p.getQuantity())
+                    ))
+                    .toList();
+
+            responses.add(new ReceiptResponse(
+                    r.getId(),
+                    r.getShop().getShopName(),
+                    r.getReceiptDate().toString(),
+                    r.getTotalPrice(),
+                    items
+            ));
+        }
+        return responses;
+    }
+
+    @Transactional
     @Override
     public ReceiptSummaryResponse getSummaryById(Long receiptId) {
         Receipt r = receiptRepository.findById(receiptId)

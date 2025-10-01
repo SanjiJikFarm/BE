@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/receipt")
 @RequiredArgsConstructor
@@ -31,6 +33,12 @@ public class ReceiptController {
     @PostMapping("/summary")
     public ResponseEntity<ReceiptSummaryResponse> summarize(@RequestBody ReceiptRequest request) {
         return ResponseEntity.ok(ReceiptSummaryResponse.from(request));
+    }
+
+    // username으로 전체 영수증 가져오기
+    @GetMapping("/receiptList")
+    public ResponseEntity<List<ReceiptResponse>>  getReceiptByUsername(@RequestParam String username) {
+        return ResponseEntity.ok(receiptService.getReceiptsByUsername(username));
     }
 
     // 저장된 영수증 id로 요약
