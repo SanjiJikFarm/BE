@@ -33,24 +33,21 @@ public class UserService {
             if (userRepository.existsByUsername(request.getUsername())) {
                 return new AuthResponse(false, "이미 사용 중인 사용자명입니다.");
             }
-            if (userRepository.existsByEmail(request.getEmail())) {
-                return new AuthResponse(false, "이미 사용 중인 이메일입니다.");
-            }
 
             String encodedPassword = passwordEncoder.encode(request.getPassword());
-            User user = new User(request.getUsername(), request.getEmail(), encodedPassword);
+            User user = new User(request.getUsername(), encodedPassword);
             User saved = userRepository.save(user);
 
             // 회원가입 응답(토큰은 발급하지 않음)
             return new AuthResponse(true, "회원가입이 성공적으로 완료되었습니다.",
-                    saved.getUsername(), saved.getEmail(), null);
+                    saved.getUsername(), null);
         } catch (Exception e) {
             return new AuthResponse(false, "회원가입 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
     public User findByUsername(String username) { return userRepository.findByUsername(username).orElse(null); }
-    public User findByEmail(String email) { return userRepository.findByEmail(email).orElse(null); }
+   // public User findByEmail(String email) { return userRepository.findByEmail(email).orElse(null); }
 
     public AuthResponse login(LoginRequest request) {
         try {
@@ -79,7 +76,6 @@ public class UserService {
                     true,
                     "로그인이 성공적으로 완료되었습니다.",
                     user.getUsername(),
-                    user.getEmail(),
                     accessToken
             );
             res.setRefreshToken(refreshToken);
