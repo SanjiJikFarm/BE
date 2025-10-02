@@ -2,6 +2,7 @@ package com.example.SanjiBE.controller;
 
 import com.example.SanjiBE.dto.ProductResponse;
 import com.example.SanjiBE.service.ProductService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/shops/{shopId}/product")
+@Tag(name = "Product", description = "상품 관련 API")
 @RequiredArgsConstructor
 public class ProductController {
 

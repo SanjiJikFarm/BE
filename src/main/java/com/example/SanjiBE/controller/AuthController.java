@@ -9,6 +9,7 @@ import com.example.SanjiBE.entity.RefreshToken;
 import com.example.SanjiBE.security.JwtTokenProvider;
 import com.example.SanjiBE.service.RefreshTokenService;
 import com.example.SanjiBE.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/auth")
 @CrossOrigin(origins = "*")
+@Tag(name = "Authorization", description = "로그인/회원가입")
 public class AuthController {
 
     @Autowired
@@ -71,7 +73,7 @@ public class AuthController {
                             java.time.Instant.now().plusMillis(refreshExpirationMs))
             );
 
-            AuthResponse res = new AuthResponse(true, "토큰 재발급 완료", username, null, newAccess);
+            AuthResponse res = new AuthResponse(true, "토큰 재발급 완료", username, newAccess);
             res.setRefreshToken(newRefresh);
             return ResponseEntity.ok(res);
         } catch (Exception e) {
