@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/shops/{shopId}/product")
+@RequestMapping("/api/shops/{shopId}/productList")
 @Tag(name = "Product", description = "상품 관련 API")
 @RequiredArgsConstructor
 public class ProductController {
