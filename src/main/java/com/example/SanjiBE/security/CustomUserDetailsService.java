@@ -42,7 +42,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 기본 권한만 부여
         List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));
 
-        // 계정 상태 플래그 (엔티티에 상태 필드가 없으므로 전부 true)
+        // 계정 상태 플래그
         boolean enabled = true;
         boolean accountNonExpired = true;
         boolean credentialsNonExpired = true;
