@@ -42,4 +42,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
         ORDER BY r.createdAt DESC
         """)
     List<ReviewResponse> findMyReviews(@Param("userId") Long userId);
+    boolean existsByUser_IdAndProduct_Id(Long userId, Long productId);
 }
