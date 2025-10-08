@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
  */
 @Getter
 @Setter
-@NoArgsConstructor      // 기본 생성자 Lombok으로 제공
+@NoArgsConstructor
 @AllArgsConstructor
 public class ReviewResponse {
     private Long reviewId;
