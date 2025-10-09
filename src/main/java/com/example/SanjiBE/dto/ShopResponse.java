@@ -12,5 +12,6 @@ public class ShopResponse {
     private String address;
     private double averageRating;
     private long reviewCount;     // 매장 전체 상품 리뷰 개수
+    private String phone;
 }
 
