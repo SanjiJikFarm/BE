@@ -1,17 +1,29 @@
 package com.example.SanjiBE.dto;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
+@NoArgsConstructor
+
 public class ShopResponse {
-    private Long shopId;
+    private Long id;
     private String shopName;
     private String shopImage;
     private String address;
-    private double averageRating;
-    private long reviewCount;     // 매장 전체 상품 리뷰 개수
-    private String phone;
-}
+    private Double avgRating;
+    private Long reviewCount;
 
+
+    public ShopResponse(Long id, String shopName, String shopImage, String address, Double avgRating, Long reviewCount) {
+        this.id = id;
+        this.shopName = shopName;
+        this.shopImage = shopImage;
+        this.address = address;
+        this.avgRating = avgRating;
+        this.reviewCount = reviewCount;
+    }
+}
