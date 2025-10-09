@@ -38,14 +38,16 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOrigins(List.of("*")); // 배포 시 도메인으로 제한하기
-        c.setAllowedMethods(List.of("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        c.setAllowedOrigins(List.of("http://localhost:5173")); // 추후에 배포 주소로 수정 
+        c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
-        c.setAllowCredentials(false);
+        c.setAllowCredentials(true); 
+        c.setExposedHeaders(List.of("Authorization")); 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", c);
         return source;
     }
+    
 
     // JWT 필터 인스턴스 생성 (빈 등록 아님)
     private JwtAuthenticationFilter jwtFilter(JwtTokenProvider tp, CustomUserDetailsService uds) {
