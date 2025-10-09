@@ -32,11 +32,11 @@ public class ReceiptServiceImpl implements ReceiptService {
         // Shop 확인
         // 먼저 매장 있는 지 확인
         Shop shop = shopRepository.findByShopName(req.getStoreName())
-            .orElseGet(() -> { // 업으면 매장 생성 후 리포지토리 저장
-                Shop shop1 = new Shop();
-                shop1.setShopName(req.getStoreName());
-                return shopRepository.save(shop1);
-            });
+                .orElseGet(() -> { // 업으면 매장 생성 후 리포지토리 저장
+                    Shop shop1 = new Shop();
+                    shop1.setShopName(req.getStoreName());
+                    return shopRepository.save(shop1);
+                });
 
         // 영수증 중복 로직
         LocalDate date = LocalDate.parse(req.getDate().replace(".", "-")); // LocalDate 형식으로
@@ -56,7 +56,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
         // 4. Purchase + Product 저장
         List<ReceiptItemDto> items = new ArrayList<>();
-        for (ReceiptItemDto dto : req.getItems()) {
+        for (ReceiptItemDto dto : req.getItemList()) { // 수정됨
             int price = Integer.parseInt(dto.getPrice().replace(",", ""));
             int qty = Integer.parseInt(dto.getQty().replace(",", ""));
 
@@ -75,10 +75,14 @@ public class ReceiptServiceImpl implements ReceiptService {
             purchase.setQuantity(qty);
             purchaseRepository.save(purchase);
 
-            items.add(dto);
+            items.add(new ReceiptItemDto(
+                    product.getId(),
+                    dto.getName(),
+                    dto.getPrice(),
+                    dto.getQty(),
+                    String.valueOf(price * qty)
+            ));
         }
-
-
 
         return new ReceiptResponse(receipt.getId(), shop.getShopName(), req.getDate(), total, items);
     }
@@ -95,6 +99,7 @@ public class ReceiptServiceImpl implements ReceiptService {
             // Purchase → ReceiptItemDto 변환
             List<ReceiptItemDto> items = r.getPurchases().stream()
                     .map(p -> new ReceiptItemDto(
+                            p.getProduct().getId(),
                             p.getProduct().getProductName(),
                             String.valueOf(p.getProduct().getProductPrice()),
                             String.valueOf(p.getQuantity()),
@@ -126,4 +131,3 @@ public class ReceiptServiceImpl implements ReceiptService {
                 .build();
     }
 }
-
