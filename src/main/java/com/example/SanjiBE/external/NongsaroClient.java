@@ -23,94 +23,108 @@ import com.example.SanjiBE.dto.FoodApiResponse;
 
 @Component
 public class NongsaroClient {
-  @Value("${nongsaro.api.base-url}")
-  private String baseUrl;
 
-  @Value("${nongsaro.api.key}")
-  private String apiKey;
+    @Value("${nongsaro.api.base-url}")
+    private String baseUrl;
 
-  // API 호출 메서드
-  public List<FoodApiResponse> fetchMonthFood(int year, int month) {
-    try {
-      String y = String.valueOf(year);
-      String m = String.format("%02d", month);
-      String url = baseUrl // URL 인코딩
-          + "/monthFdmtLst"
-          + "?apiKey=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8)
-          + "&thisYear=" + URLEncoder.encode(y, StandardCharsets.UTF_8)
-          + "&thisMonth=" + URLEncoder.encode(m, StandardCharsets.UTF_8);
+    @Value("${nongsaro.api.key}")
+    private String apiKey;
 
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest req = HttpRequest.newBuilder(URI.create(url)).GET().build();
-      HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
+    /**
+     * 농사로 API 호출 - 월별 식재료 목록 조회
+     */
+    public List<FoodApiResponse> fetchMonthFood(int year, int month) {
+        try {
+            String y = String.valueOf(year);
+            String m = String.format("%02d", month);
 
-      // 성공
-      if(res.statusCode() / 100 != 2 ){
-        throw new RuntimeException("농사로 API 실패: HTTP" + res.statusCode());
-      } 
+            String url = baseUrl
+                    + "/monthFdmtLst"
+                    + "?apiKey=" + URLEncoder.encode(apiKey, StandardCharsets.UTF_8)
+                    + "&thisYear=" + URLEncoder.encode(y, StandardCharsets.UTF_8)
+                    + "&thisMonth=" + URLEncoder.encode(m, StandardCharsets.UTF_8);
 
-      return parseXml(res.body());  
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest req = HttpRequest.newBuilder(URI.create(url)).GET().build();
+            HttpResponse<String> res = client.send(req, HttpResponse.BodyHandlers.ofString());
 
-    } catch (Exception e) {
-      throw new RuntimeException("농사로 API 호출 오류" + e.getMessage(), e);
-    }
-  }
+            if (res.statusCode() / 100 != 2) {
+                throw new RuntimeException("농사로 API 실패: HTTP " + res.statusCode());
+            }
 
-  // XML 파싱
-  private List<FoodApiResponse> parseXml(String xml) throws Exception{
-    var list = new ArrayList<FoodApiResponse>();
-    
-    var dbf = DocumentBuilderFactory.newInstance();
-    dbf.setNamespaceAware(false);
-    var doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+            return parseXml(res.body());
 
-    // item 태그 추출
-    NodeList items = doc.getElementsByTagName("item");
-
-    // Item tag 추출 후에 DTO에 추가
-    for(int i = 0; i < items.getLength(); i++){
-      Element item = (Element) items.item(i);
-
-      String foodNum = text(item, "cntntsNo");
-      String foodName = text(item, "fdmtNm");
-      String cours = text(item, "rtnFileCours");
-      String fileNm = text(item, "rtnStreFileNm");
-
-      // 경로 + 파일이름 -> URL
-      String imageUrl = toImageUrl(cours, fileNm);
-
-      if(foodNum != null && foodName != null){
-        list.add(new FoodApiResponse(foodNum, foodName, imageUrl));
-      }
-    }
-    return list;
-  }
-  // tag를 text로
-  private static String text(Element parent, String tag){
-    NodeList nl = parent.getElementsByTagName(tag);
-    if(nl.getLength() == 0){
-      return null;
+        } catch (Exception e) {
+            throw new RuntimeException("농사로 API 호출 오류: " + e.getMessage(), e);
+        }
     }
 
-    Node n = nl.item(0);
-    String s= n.getTextContent();
-    return (s == null) ? null : s.trim();
-  }
+    /**
+     * XML 파싱 → FoodApiResponse 리스트로 변환
+     */
+    private List<FoodApiResponse> parseXml(String xml) throws Exception {
+        var list = new ArrayList<FoodApiResponse>();
 
-  // 슬래시 제거후 주소 변환
-  private static String toImageUrl(String path, String name){
-    if(path == null || name == null){
-      return null;
+        var dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(false);
+        var doc = dbf.newDocumentBuilder().parse(new InputSource(new StringReader(xml)));
+
+        NodeList items = doc.getElementsByTagName("item");
+
+        for (int i = 0; i < items.getLength(); i++) {
+            Element item = (Element) items.item(i);
+
+            String foodNum = text(item, "cntntsNo");
+            String foodName = text(item, "fdmtNm");
+            String cours = text(item, "rtnFileCours");
+            String fileNm = text(item, "rtnStreFileNm");
+
+            String imageUrl = toImageUrl(cours, fileNm);
+
+            if (foodNum != null && foodName != null) {
+                list.add(new FoodApiResponse(foodNum, foodName, imageUrl));
+            }
+        }
+
+        return list;
     }
 
-    // 슬래시 중복 방지 로직
-    String p = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
-    String f = name.startsWith("/") ? path.substring(1) : path;
-
-    if (p.startsWith("http://") || p.startsWith("https://")) {
-      return p + "/" + f;
-    } else {
-        return "http://www.nongsaro.go.kr" + (p.startsWith("/") ? "" : "/") + p + "/" + f;
+    /**
+     * 특정 태그 내용을 텍스트로 추출
+     */
+    private static String text(Element parent, String tag) {
+        NodeList nl = parent.getElementsByTagName(tag);
+        if (nl.getLength() == 0) {
+            return null;
+        }
+        Node n = nl.item(0);
+        String s = n.getTextContent();
+        return (s == null) ? null : s.trim();
     }
-  }
+
+    /**
+     * 파일 경로 + 파일명 조합 → 이미지 URL 생성
+     */
+    private static String toImageUrl(String path, String name) {
+        if (path == null || name == null) {
+            return null;
+        }
+
+        // 슬래시 정리
+        String p = path.endsWith("/") ? path.substring(0, path.length() - 1) : path;
+        String f = name.startsWith("/") ? name.substring(1) : name;
+
+        // 확장자 확인 (jpg/png 등만 허용)
+        if (!f.contains(".")) {
+            return null;
+        }
+
+        // 절대경로 또는 상대경로에 따라 URL 생성
+        if (p.startsWith("http://") || p.startsWith("https://")) {
+            return p + "/" + f;
+        } else {
+            // HTTPS로 변경
+            return "https://www.nongsaro.go.kr" + (p.startsWith("/") ? "" : "/") + p + "/" + f;
+        }
+    }
 }
