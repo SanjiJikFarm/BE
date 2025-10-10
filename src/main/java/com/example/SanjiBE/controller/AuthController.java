@@ -1,4 +1,3 @@
-// src/main/java/com/example/SanjiBE/controller/AuthController.java
 package com.example.SanjiBE.controller;
 
 import com.example.SanjiBE.dto.AuthResponse;
@@ -6,6 +5,7 @@ import com.example.SanjiBE.dto.LoginRequest;
 import com.example.SanjiBE.dto.RefreshRequest;
 import com.example.SanjiBE.dto.RegisterRequest;
 import com.example.SanjiBE.entity.RefreshToken;
+import com.example.SanjiBE.entity.User;
 import com.example.SanjiBE.security.JwtTokenProvider;
 import com.example.SanjiBE.service.RefreshTokenService;
 import com.example.SanjiBE.service.UserService;
@@ -53,7 +53,7 @@ public class AuthController {
         }
     }
 
-    // 액세스 재발급(+회전)
+    // 액세스 토큰 재발급 (+회전)
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest req) {
         try {
@@ -63,8 +63,20 @@ public class AuthController {
                         .body(new AuthResponse(false, "유효하지 않은 리프레시 토큰입니다."));
             }
 
+            // 기존 리프레시 토큰에서 username 추출
             String username = jwtTokenProvider.getUsername(req.getRefreshToken());
-            String newAccess = jwtTokenProvider.generateToken(username);
+
+            // userId 조회 (DB에서 username으로)
+            User user = userService.findByUsername(username);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new AuthResponse(false, "존재하지 않는 사용자입니다."));
+            }
+
+            // 수정된 부분: userId도 포함하여 새 access token 생성
+            String newAccess = jwtTokenProvider.generateToken(user.getId(), username);
+
+            // 리프레시 토큰도 재발급
             String newRefresh = jwtTokenProvider.generateRefreshToken(username, refreshExpirationMs);
 
             refreshTokenService.rotate(

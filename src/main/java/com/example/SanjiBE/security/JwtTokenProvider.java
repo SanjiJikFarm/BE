@@ -20,13 +20,12 @@ public class JwtTokenProvider {
             @Value("${jwt.secret}") String secret,
             @Value("${jwt.expiration}") long expirationMs
     ) {
-        // HS256용 SecretKey 생성
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMs = expirationMs;
     }
 
-    // username을 subject로 하는 액세스 토큰 생성
-    public String generateToken(String username) {
+    // userId를 함께 받도록 수정
+    public String generateToken(Long userId, String username) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + expirationMs);
 
@@ -34,11 +33,22 @@ public class JwtTokenProvider {
                 .subject(username)
                 .issuedAt(now)
                 .expiration(exp)
+                .claim("userId", userId)
                 .signWith(key)
                 .compact();
     }
 
-    // 토큰에서 username 추출
+    // userId 추출
+    public Long getUserId(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        return claims.get("userId", Long.class);
+    }
+
+    // username 추출
     public String getUsername(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)
@@ -48,7 +58,7 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    // 만료/서명 검증
+    // 유효성 검증
     public boolean validate(String token) {
         try {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
@@ -58,6 +68,7 @@ public class JwtTokenProvider {
         }
     }
 
+    // RefreshToken은 userId 없이 사용 가능
     public String generateRefreshToken(String username, long refreshExpirationMs) {
         Date now = new Date();
         Date exp = new Date(now.getTime() + refreshExpirationMs);
@@ -68,5 +79,4 @@ public class JwtTokenProvider {
                 .signWith(key)
                 .compact();
     }
-
 }

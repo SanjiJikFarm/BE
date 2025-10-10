@@ -1,9 +1,11 @@
 package com.example.SanjiBE.controller;
 
+import com.example.SanjiBE.security.CustomUserDetails;
 import com.example.SanjiBE.service.CarbonMonthlyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,30 +19,30 @@ public class CarbonController {
 
     private final CarbonMonthlyService monthlyService;
 
-    @GetMapping("/monthly/{userId}")
+    @GetMapping("/monthly")
     @Operation(summary = "달 별 탄소 절감량 계산")
     public Map<String, Object> getMonthlySummary(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam String month
     ) {
-        return monthlyService.getMonthlySummary(userId, month);
+        return monthlyService.getMonthlySummary(user.getId(), month);
     }
 
-    @GetMapping("/product/{userId}")
+    @GetMapping("/product")
     @Operation(summary = "상품별 탄소 절감량 계산")
     public List<Map<String, Object>> getMonthlyDetail(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam String month
     ) {
-        return monthlyService.getMonthlyDetail(userId, month);
+        return monthlyService.getMonthlyDetail(user.getId(), month);
     }
 
-    @GetMapping("/weekly/{userId}")
+    @GetMapping("/weekly")
     @Operation(summary = "주별 탄소 절감량 계산")
     public List<Map<String, Object>> getWeeklySummary(
-            @PathVariable Long userId,
+            @AuthenticationPrincipal CustomUserDetails user,
             @RequestParam String month
     ) {
-        return monthlyService.getWeeklySummary(userId, month);
+        return monthlyService.getWeeklySummary(user.getId(), month);
     }
 }

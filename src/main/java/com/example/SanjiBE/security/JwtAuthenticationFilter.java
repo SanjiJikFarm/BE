@@ -13,13 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-/**
- * Authorization: Bearer <token> 을 읽어
- * - 토큰 유효성 검증
- * - username 추출
- * - CustomUserDetailsService로 사용자 조회
- * - SecurityContext에 Authentication 세팅
- */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -32,33 +25,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain chain
-    ) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain chain)
+            throws ServletException, IOException {
 
         String token = resolveToken(request);
 
         try {
             if (StringUtils.hasText(token) && jwtTokenProvider.validate(token)) {
                 String username = jwtTokenProvider.getUsername(token);
+                Long userId = jwtTokenProvider.getUserId(token);
 
-                // CustomUserDetails 반환됨
+                // DB에서 사용자 조회
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+                // (선택) DB 정보와 토큰의 userId가 일치하는지 검증
+                if (!customUser.getId().equals(userId)) {
+                    SecurityContextHolder.clearContext();
+                    chain.doFilter(request, response);
+                    return;
+                }
 
                 UsernamePasswordAuthenticationToken auth =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
+                        new UsernamePasswordAuthenticationToken(customUser, null, customUser.getAuthorities());
                 auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
                 SecurityContextHolder.getContext().setAuthentication(auth);
             }
         } catch (Exception ex) {
-            // 토큰이 잘못되었거나 예외가 발생한 경우 익명 처리
             SecurityContextHolder.clearContext();
         }
 
