@@ -59,7 +59,7 @@ public class UserService {
             }
 
             // 액세스 토큰
-            String accessToken = jwtTokenProvider.generateToken(user.getUsername());
+            String accessToken = jwtTokenProvider.generateToken(user.getId(),user.getUsername());
 
 // 리프레시 토큰
             String refreshToken = jwtTokenProvider.generateRefreshToken(
