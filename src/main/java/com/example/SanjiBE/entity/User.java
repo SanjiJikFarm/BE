@@ -56,6 +56,17 @@ public class User {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
     public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 
+    @Column(name = "profile_key")
+    private String profileKey;
+
+    public String getProfileKey() {
+        return profileKey;
+    }
+
+    public void setProfileKey(String profileKey) {
+        this.profileKey = profileKey;
+    }
+
     @Override
     public String toString() {
         return "User{" +
