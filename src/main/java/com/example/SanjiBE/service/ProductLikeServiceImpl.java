@@ -14,6 +14,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+// 추가 import
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+
 @Service
 @RequiredArgsConstructor
 public class ProductLikeServiceImpl implements ProductLikeService {
@@ -61,6 +65,27 @@ public class ProductLikeServiceImpl implements ProductLikeService {
     @Transactional(readOnly = true)
     @Override
     public Page<ProductResponse> getMyLikes(Long userId, Pageable pageable) {
-        return productLikeRepository.findLikedProductsAsDto(userId, pageable);
+        // 클라이언트에서 보낸 sort 키를 안전한 엔티티 경로로 매핑.
+        Pageable safe = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                remapSort(pageable.getSort())
+        );
+        return productLikeRepository.findLikedProductsAsDto(userId, safe);
+    }
+
+    private Sort remapSort(Sort sort) {
+        if (sort == null || sort.isUnsorted()) {
+            return Sort.by(Sort.Direction.DESC, "product.id"); // 기본 정렬
+        }
+        return Sort.by(
+                sort.stream().map(order -> {
+                    String prop = order.getProperty();
+                    if ("productId".equals(prop) || "id".equals(prop)) prop = "product.id";
+                    else if ("createdAt".equals(prop)) prop = "createdAt";
+                    else prop = "product.id";
+                    return new Sort.Order(order.getDirection(), prop);
+                }).toList()
+        );
     }
 }
