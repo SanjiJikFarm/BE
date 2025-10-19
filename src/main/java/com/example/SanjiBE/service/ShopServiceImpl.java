@@ -2,15 +2,12 @@ package com.example.SanjiBE.service;
 
 import com.example.SanjiBE.dto.ShopMapResponse;
 import com.example.SanjiBE.dto.ShopResponse;
-import com.example.SanjiBE.entity.Review;
-import com.example.SanjiBE.entity.Shop;
 import com.example.SanjiBE.repository.ShopRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,16 +32,46 @@ public class ShopServiceImpl implements ShopService {
         return shopRepository.searchWithStats(key);
     }
 
-    // 초기 로딩
+    // 기존 시그니처: 기본 rating 정렬로 위임
     @Override
     public List<ShopMapResponse> getAllShopsForMap() {
-        return shopRepository.findAllForMapWithStats();
+        return getAllShopsForMap("rating", null, null);
     }
 
-    // 거리순 조회
+    // 기존 시그니처: 기본 distance 정렬로 위임
     @Override
     public List<ShopMapResponse> getNearbyShops(double lat, double lng, Double radiusKm, String keyword) {
+        return getNearbyShops(lat, lng, radiusKm, keyword, "distance");
+    }
+
+    // 신규: 초기 목록 정렬 지원
+    @Override
+    public List<ShopMapResponse> getAllShopsForMap(String sort, Double lat, Double lng) {
+        String s = normalizeSort(sort, "rating");
+        if ("distance".equals(s)) {
+            if (lat == null || lng == null) {
+                throw new IllegalArgumentException("sort=distance 는 lat,lng가 필요합니다");
+            }
+            List<Object[]> rows = shopRepository.findNearbyForMapNative(lat, lng, null, null);
+            return mapNearbyRows(rows);
+        }
+        return shopRepository.findAllForMapOrderByRating();
+    }
+
+    // 신규: 근처 정렬 지원
+    @Override
+    public List<ShopMapResponse> getNearbyShops(double lat, double lng, Double radiusKm, String keyword, String sort) {
+        String s = normalizeSort(sort, "distance");
+        if ("rating".equals(s)) {
+            List<Object[]> rows = shopRepository.findNearbyForMapOrderByRating(lat, lng, radiusKm, keyword);
+            return mapNearbyRows(rows);
+        }
         List<Object[]> rows = shopRepository.findNearbyForMapNative(lat, lng, radiusKm, keyword);
+        return mapNearbyRows(rows);
+    }
+
+    // 공통 매핑
+    private List<ShopMapResponse> mapNearbyRows(List<Object[]> rows) {
         List<ShopMapResponse> result = new ArrayList<>(rows.size());
         for (Object[] o : rows) {
             Long   id          = ((Number) o[0]).longValue();
@@ -63,5 +90,13 @@ public class ShopServiceImpl implements ShopService {
             ));
         }
         return result;
+    }
+
+    // sort 파라미터 정규화
+    private String normalizeSort(String sort, String defaultSort) {
+        if (sort == null) return defaultSort;
+        String s = sort.trim().toLowerCase();
+        if ("distance".equals(s) || "rating".equals(s)) return s;
+        return defaultSort;
     }
 }

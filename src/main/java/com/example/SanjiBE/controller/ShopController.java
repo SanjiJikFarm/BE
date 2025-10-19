@@ -40,21 +40,27 @@ public class ShopController {
     }
 
     // 좌표 보유 매장 전체
-    @Operation(summary = "지도용 전체 매장(좌표 보유만)")
+    @Operation(summary = "지도용 전체 매장", description = "sort=distance | rating. rating 기본.")
     @GetMapping("/map")
-    public List<ShopMapResponse> getAllShopsForMap() {
-        return shopService.getAllShopsForMap();
+    public List<ShopMapResponse> getAllShopsForMap(
+            @RequestParam(required = false, defaultValue = "rating") String sort,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng
+    ) {
+        // sort=distance일 때만 lat/lng 요구
+        return shopService.getAllShopsForMap(sort, lat, lng);
     }
 
-    // 지도 거리순
-    @Operation(summary = "거리 기준 매장 조회", description = "사용자 좌표 기준 가까운 순. radiusKm/keyword 옵션")
+    // 거리순/평점순 지원
+    @Operation(summary = "거리 기준 매장 조회", description = "sort=distance|rating. distance 기본. radiusKm/keyword 옵션")
     @GetMapping("/map/nearby")
     public List<ShopMapResponse> getNearbyShops(
             @RequestParam double lat,
             @RequestParam double lng,
             @RequestParam(required = false) Double radiusKm,
-            @RequestParam(required = false) String keyword
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false, defaultValue = "distance") String sort
     ) {
-        return shopService.getNearbyShops(lat, lng, radiusKm, keyword);
+        return shopService.getNearbyShops(lat, lng, radiusKm, keyword, sort);
     }
 }
