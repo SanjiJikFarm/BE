@@ -1,5 +1,6 @@
 package com.example.SanjiBE.controller;
 
+import com.example.SanjiBE.dto.ShopMapResponse;
 import com.example.SanjiBE.dto.ShopResponse;
 import com.example.SanjiBE.service.ShopService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,5 +37,24 @@ public class ShopController {
     @GetMapping(params = "keyword")
     public List<ShopResponse> searchShops(@RequestParam String keyword) {
         return shopService.searchShops(keyword);
+    }
+
+    // 좌표 보유 매장 전체
+    @Operation(summary = "지도용 전체 매장(좌표 보유만)")
+    @GetMapping("/map")
+    public List<ShopMapResponse> getAllShopsForMap() {
+        return shopService.getAllShopsForMap();
+    }
+
+    // 지도 거리순
+    @Operation(summary = "거리 기준 매장 조회", description = "사용자 좌표 기준 가까운 순. radiusKm/keyword 옵션")
+    @GetMapping("/map/nearby")
+    public List<ShopMapResponse> getNearbyShops(
+            @RequestParam double lat,
+            @RequestParam double lng,
+            @RequestParam(required = false) Double radiusKm,
+            @RequestParam(required = false) String keyword
+    ) {
+        return shopService.getNearbyShops(lat, lng, radiusKm, keyword);
     }
 }
