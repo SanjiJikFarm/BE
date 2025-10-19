@@ -73,4 +73,18 @@ public class ShopServiceImpl implements ShopService {
         if ("distance".equals(s) || "rating".equals(s)) return s;
         return defaultSort;
     }
+
+    @Override
+    public List<ShopMapResponse> searchShops(String keyword, String sort, Double lat, Double lng, Double radiusKm) {
+        String key = (keyword == null) ? "" : keyword.trim();
+        String s = normalizeSort(sort, "rating");
+
+        if ("distance".equals(s)) {
+            if (lat == null || lng == null) {
+                throw new IllegalArgumentException("sort=distance 는 lat,lng가 필요합니다");
+            }
+            return shopRepository.searchForMapOrderByDistance(key, lat, lng, radiusKm);
+        }
+        return shopRepository.searchForMapOrderByRating(key);
+    }
 }

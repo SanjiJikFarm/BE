@@ -24,4 +24,7 @@ public interface ShopService {
 
     // 정렬 지원: /map/nearby
     List<ShopMapResponse> getNearbyShops(double lat, double lng, Double radiusKm, String keyword, String sort);
+
+    List<ShopMapResponse> searchShops(String keyword, String sort, Double lat, Double lng, Double radiusKm);
+
 }

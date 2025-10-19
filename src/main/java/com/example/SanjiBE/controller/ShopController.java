@@ -33,11 +33,18 @@ public class ShopController {
     }
 
     // 검색
-    @Operation(summary = "매장 검색")
-    @GetMapping(params = "keyword")
-    public List<ShopResponse> searchShops(@RequestParam String keyword) {
-        return shopService.searchShops(keyword);
+    @Operation(summary = "지도용 매장 검색", description = "keyword로 검색 후 sort=distance|rating. distance면 lat,lng 필수, radiusKm 선택")
+    @GetMapping("/map/search")
+    public List<ShopMapResponse> searchShopsForMap(
+            @RequestParam String keyword,
+            @RequestParam(required = false, defaultValue = "rating") String sort,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng,
+            @RequestParam(required = false) Double radiusKm
+    ) {
+        return shopService.searchShops(keyword, sort, lat, lng, radiusKm);
     }
+
 
     // 좌표 보유 매장 전체
     @Operation(summary = "지도용 전체 매장", description = "sort=distance | rating. rating 기본.")
