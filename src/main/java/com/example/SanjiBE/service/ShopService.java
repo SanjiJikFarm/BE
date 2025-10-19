@@ -13,15 +13,18 @@ public interface ShopService {
 
     List<ShopResponse> searchShops(String keyword);
 
-    // 기존 시그니처(초기 지도용). 내부적으로 rating 정렬로 위임.
+    // 기존 시그니처: 초기 지도용(기본 rating)
     List<ShopMapResponse> getAllShopsForMap();
 
-    // 기존 시그니처(근처 매장). 내부적으로 distance 정렬로 위임.
+    // 기존 시그니처: 근처(기본 distance)
     List<ShopMapResponse> getNearbyShops(double lat, double lng, Double radiusKm, String keyword);
 
-    // 신규: 초기 지도용 목록 정렬 지원. sort=distance면 lat/lng 필요.
+    // 정렬 지원: /map
     List<ShopMapResponse> getAllShopsForMap(String sort, Double lat, Double lng);
 
-    // 신규: 근처 매장 정렬 지원. sort=distance|rating
+    // 정렬 지원: /map/nearby
     List<ShopMapResponse> getNearbyShops(double lat, double lng, Double radiusKm, String keyword, String sort);
+
+    List<ShopMapResponse> searchShops(String keyword, String sort, Double lat, Double lng, Double radiusKm);
+
 }
