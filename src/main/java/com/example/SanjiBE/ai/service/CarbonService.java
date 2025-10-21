@@ -1,4 +1,4 @@
-package com.example.SanjiBE.service;
+package com.example.SanjiBE.ai.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

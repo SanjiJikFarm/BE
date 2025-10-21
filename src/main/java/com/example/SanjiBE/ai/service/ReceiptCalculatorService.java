@@ -1,4 +1,4 @@
-package com.example.SanjiBE.service;
+package com.example.SanjiBE.ai.service;
 
 import com.example.SanjiBE.entity.ImportOrigin;
 import com.example.SanjiBE.entity.LocalOrigin;
