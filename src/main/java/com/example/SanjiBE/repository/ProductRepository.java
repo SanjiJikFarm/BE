@@ -10,7 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
+
+    // 매장별 상품 목록
     List<Product> findByShop_Id(Long shopId);
 
+    // 동일 매장 내 상품명 중복 검사 등에 사용
     Optional<Product> findByShopAndProductName(Shop shop, String name);
+
 }

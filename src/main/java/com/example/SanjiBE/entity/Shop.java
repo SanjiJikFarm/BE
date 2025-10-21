@@ -37,6 +37,12 @@ public class Shop {
     @Column(name = "shop_image")
     private String shopImage;
 
+    @Column(name = "latitude", columnDefinition = "DOUBLE")
+    private Double latitude;   // 위도
+
+    @Column(name = "longitude", columnDefinition = "DOUBLE")
+    private Double longitude;  // 경도
+
     // 상품과의 관계
     @OneToMany(mappedBy = "shop", fetch = FetchType.LAZY)
     private List<Product> products;

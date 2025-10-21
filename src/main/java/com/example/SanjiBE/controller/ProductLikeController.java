@@ -42,7 +42,7 @@ public class ProductLikeController {
     }
 
     @Operation(summary = "내 찜 목록", description = "인증 사용자 본인의 찜 목록을 조회")
-    @GetMapping("/users/likes") // ← 경로 변수 없음
+    @GetMapping("/users/likes")
     public Page<ProductResponse> getMyLikes(
             @AuthenticationPrincipal(expression = "id") Long authUserId,
             @ParameterObject Pageable pageable
