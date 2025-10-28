@@ -24,16 +24,11 @@ public class AiIntegrationService {
 
         Map<String, Object> requestBody = Map.of(
                 "userId", userId,
-                "month", month
+                "month", month,
+                "receipts", List.of() // 아직 receipt 데이터 없으면 빈 리스트로 전달
         );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
-
-        return response.getBody();
+        return postRequest(url, requestBody, Map.class);
     }
 
     /**
@@ -44,16 +39,11 @@ public class AiIntegrationService {
 
         Map<String, Object> requestBody = Map.of(
                 "userId", userId,
-                "month", month
+                "month", month,
+                "receipts", List.of()
         );
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<List> response = restTemplate.postForEntity(url, entity, List.class);
-
-        return response.getBody();
+        return postRequest(url, requestBody, List.class);
     }
 
     /**
@@ -64,14 +54,27 @@ public class AiIntegrationService {
 
         Map<String, Object> requestBody = Map.of(
                 "userId", userId,
-                "month", month
+                "month", month,
+                "receipts", List.of()
         );
 
+        return postRequest(url, requestBody, List.class);
+    }
+
+    /**
+     * 공통 POST 요청 처리 메서드
+     */
+    private <T> T postRequest(String url, Map<String, Object> body, Class<T> responseType) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<List> response = restTemplate.postForEntity(url, entity, List.class);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
+
+        ResponseEntity<T> response = restTemplate.postForEntity(url, entity, responseType);
+
+        if (!response.getStatusCode().is2xxSuccessful() || response.getBody() == null) {
+            throw new RuntimeException("AI 서버 응답 실패: " + response.getStatusCode());
+        }
 
         return response.getBody();
     }
