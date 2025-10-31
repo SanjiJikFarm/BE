@@ -32,14 +32,14 @@ jobs:
       - name: Docker login
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKERHUB_ID }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       # Image build & push
       - name: Build & Push Docker Image
         id: tag
         env:
-          IMAGE_NAME: ${{ secrets.DOCKERHUB_ID }}/sanjifarm-be
+          IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/sanjifarm-be
         run: |
           TAG=git-${GITHUB_SHA}
           docker build -t $IMAGE_NAME:$TAG .
@@ -60,7 +60,7 @@ jobs:
 
       - name: Update image tag
         env:
-          IMAGE_NAME: ${{ secrets.DOCKERHUB_ID }}/sanjifarm-be
+          IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/sanjifarm-be
           IMAGE_TAG: ${{ needs.build.outputs.IMAGE_TAG }}
         run: |
           cd manifest/k8s
