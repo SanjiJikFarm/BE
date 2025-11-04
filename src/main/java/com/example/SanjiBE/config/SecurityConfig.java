@@ -34,7 +34,7 @@ public class SecurityConfig {
         return cfg.getAuthenticationManager();
     }
 
-    // 개발용 CORS 설정 (프리플라이트 포함)
+    // 개발용 CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
