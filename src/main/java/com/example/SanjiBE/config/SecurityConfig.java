@@ -34,11 +34,15 @@ public class SecurityConfig {
         return cfg.getAuthenticationManager();
     }
 
-    // 개발용 CORS 설정 (프리플라이트 포함)
+    // 개발용 CORS 설정
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration c = new CorsConfiguration();
-        c.setAllowedOrigins(List.of("http://localhost:5173")); // 추후에 배포 주소로 수정 
+        c.setAllowedOriginPatterns(List.of(
+                "http://localhost:5173",
+                "https://sanjijikfarm.shop",
+                "https://*.sanjijikfarm.shop" // www, api 등 하위 도메인 포함
+        ));
         c.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         c.setAllowedHeaders(List.of("*"));
         c.setAllowCredentials(true); 
