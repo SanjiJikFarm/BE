@@ -3,8 +3,10 @@ package com.example.SanjiBE.config;
 import com.example.SanjiBE.security.CustomUserDetailsService;
 import com.example.SanjiBE.security.JwtAuthenticationFilter;
 import com.example.SanjiBE.security.JwtTokenProvider;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -17,6 +19,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.*;
+import org.springframework.web.filter.CorsFilter;
+
 import java.util.List;
 
 @Configuration
@@ -51,7 +55,12 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", c);
         return source;
     }
-    
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistration() {
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource()));
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
+    }
 
     // JWT 필터 인스턴스 생성 (빈 등록 아님)
     private JwtAuthenticationFilter jwtFilter(JwtTokenProvider tp, CustomUserDetailsService uds) {
